@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "360673568159",
+    "firebase_url": "https://pedindo-da0aa.firebaseio.com",
+    "project_id": "pedindo-da0aa",
+    "storage_bucket": "pedindo-da0aa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360673568159:android:3eb842bf317cd883",
+        "android_client_info": {
+          "package_name": "pedindo.com.pedindo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "360673568159-2gqko6jdu6cj9vqdp50ctmptpvifidra.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pedindo.com.pedindo",
+            "certificate_hash": "39fbf16ec6334519a5c22a078e78ce5331851843"
+          }
+        },
+        {
+          "client_id": "360673568159-ktme1rm6p3lv0rkp8ampdick4jvae9bj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pedindo.com.pedindo",
+            "certificate_hash": "ec557113b627eb3a1d8673a4cee7c2ee943b8f0f"
+          }
+        },
+        {
+          "client_id": "360673568159-ncqvfk1mv6vdn4qrkuiujs4ud89s5s3n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQ8sBSOXQPNP_bFt46q8x6Back8Npe8yI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "360673568159-ncqvfk1mv6vdn4qrkuiujs4ud89s5s3n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360673568159:android:805dd32332276766",
+        "android_client_info": {
+          "package_name": "ledare.com.br.pedindo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "360673568159-s6mk50io0i150fjogmp1qe18h21lakcu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ledare.com.br.pedindo",
+            "certificate_hash": "39fbf16ec6334519a5c22a078e78ce5331851843"
+          }
+        },
+        {
+          "client_id": "360673568159-ncqvfk1mv6vdn4qrkuiujs4ud89s5s3n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQ8sBSOXQPNP_bFt46q8x6Back8Npe8yI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "360673568159-ncqvfk1mv6vdn4qrkuiujs4ud89s5s3n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
