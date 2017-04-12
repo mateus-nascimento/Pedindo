@@ -245,12 +245,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         if (!task.isSuccessful()) {
                             toastLong(getString(R.string.error_incorrect_password));
                         }
-
-                        // [START_EXCLUDE]
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "AUTH_FAILED_02",
-                                    Toast.LENGTH_SHORT).show();
-                        }
                     }
                 });
     }
