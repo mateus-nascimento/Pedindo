@@ -5,7 +5,8 @@
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_register">Register</string>
     <string name="action_sign_in_facebook">Sign in with facebook</string>
     <string name="action_sign_in_google">Sign in with google</string>
     <string name="action_sign_in_short">Sign in</string>
@@ -13,11 +14,21 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">User/Password is incorrect</string>
     <string name="error_field_required">This field is required</string>
+    <string name="error_unable_to_connect">Unable to connect</string>
+
+    <!-- Strings related to main -->
+    <string name="title_activity_main">Pedindo</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
 
     <!-- Strings related to keys -->
     <string name="key_google">360673568159-ncqvfk1mv6vdn4qrkuiujs4ud89s5s3n.apps.googleusercontent.com</string>
+    <string name="key_facebook">121121731766479</string>
 
     <!-- Strings related to nodes-->
     <string name="node_users">users</string>
+    <string name="action_remove_filter">Remove filters</string>
+    <string name="action_car_filter">Cars</string>
 
 </resources>
