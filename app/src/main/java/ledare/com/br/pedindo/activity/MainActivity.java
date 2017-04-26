@@ -1,6 +1,5 @@
 package ledare.com.br.pedindo.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -13,14 +12,31 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import ledare.com.br.pedindo.R;
+import ledare.com.br.pedindo.model.User;
+import ledare.com.br.pedindo.util.CircleTransform;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    //Constants
+    public static final String EXTRA_USER = "EXTRA_USER";
+
+    private User user;
+
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +55,9 @@ public class MainActivity extends BaseActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header = navigationView.getHeaderView(0);
-        setupHeader(header);
+        setupUser(header);
     }
+
 
     @Override
     public void onBackPressed() {
@@ -55,7 +72,7 @@ public class MainActivity extends BaseActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.activity_main, menu);
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -75,26 +92,6 @@ public class MainActivity extends BaseActivity
                 }
         );
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_car_filter) {
-            if(item.isChecked()){
-                item.setChecked(false);
-            }else{
-                item.setChecked(true);
-            }
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -118,12 +115,33 @@ public class MainActivity extends BaseActivity
         return true;
     }
 
-    private void setupHeader(View view) {
-        FirebaseAuth.getInstance().getCurrentUser();
 
-        TextView name = (TextView) view.findViewById(R.id.header_name);
-        TextView email = (TextView) view.findViewById(R.id.header_email);
-        name.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-        email.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+    private void setupUser(View view) {
+        final TextView name = (TextView) view.findViewById(R.id.header_name);
+        final TextView email = (TextView) view.findViewById(R.id.header_email);
+        final ImageView image = (ImageView) view.findViewById(R.id.header_image);
+
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
+        mDatabase.child(firebaseUser.getUid()).addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        user = dataSnapshot.getValue(User.class);
+
+                        name.setText(user.getName());
+                        email.setText(user.getEmail());
+                        Picasso.with(MainActivity.this).load(user.getPhoto())
+                                .transform(new CircleTransform())
+                                .into(image);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                }
+        );
     }
 }

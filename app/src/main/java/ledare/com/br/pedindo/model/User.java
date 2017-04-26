@@ -7,12 +7,9 @@ public class User {
     private String email;
     private String photo;
 
-//    public User (String id, String name, String email, String photo){
-//        this.id = id;
-//        this.name = name;
-//        this.email = email;
-//        this.photo = photo;
-//    }
+    public User () {
+
+    }
 
     public String getId() {
         return id;

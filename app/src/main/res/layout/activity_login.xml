@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <AutoCompleteTextView
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -62,48 +62,50 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <Button
+                android:id="@+id/email_sign_in_button"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/action_sign_in"
+                android:textStyle="bold" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/email_register_button"
-                    style="?android:textAppearanceSmall"
+                <com.facebook.login.widget.LoginButton
+                    xmlns:facebook="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/facebook_sign_in_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/action_register"
-                    android:textStyle="bold" />
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:layout_margin="4dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    facebook:com_facebook_login_text="Sign In" />
 
-                <Button
-                    android:id="@+id/email_sign_in_button"
-                    style="?android:textAppearanceSmall"
+                <com.google.android.gms.common.SignInButton
+                    android:id="@+id/google_sign_in_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/action_sign_in"
-                    android:textStyle="bold" />
+                    android:layout_weight="1" />
+
+
 
             </LinearLayout>
 
-            <com.facebook.login.widget.LoginButton
-                xmlns:facebook="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/facebook_sign_in_button"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/email_register_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:gravity="center"
-                android:layout_margin="4dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                facebook:com_facebook_login_text="Sign In" />
-
-            <com.google.android.gms.common.SignInButton
-                android:id="@+id/google_sign_in_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+                android:layout_marginTop="40dp"
+                android:text="@string/action_register"
+                android:layout_gravity="center_horizontal"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

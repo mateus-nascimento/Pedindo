@@ -2,14 +2,13 @@ package ledare.com.br.pedindo.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -17,10 +16,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -53,12 +50,16 @@ import ledare.com.br.pedindo.R;
 import ledare.com.br.pedindo.model.User;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
+
+    //Constants
+    public static final String EXTRA_USER = "EXTRA_USER";
+
     //Variables
     private static final int RC_SIGN_IN = 1;
 
     //UI references.
-    private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
+    private TextInputEditText mEmailView;
+    private TextInputEditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
     private LoginButton loginButton;
@@ -78,8 +79,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         setContentView(R.layout.activity_login);
 
         //Initialize UI
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mEmailView = (TextInputEditText) findViewById(R.id.email);
+        mPasswordView = (TextInputEditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -91,7 +92,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             }
         });
 
-        findViewById(R.id.email_register_button).setOnClickListener(this);
+        findViewById(R.id.email_register_text).setOnClickListener(this);
         findViewById(R.id.email_sign_in_button).setOnClickListener(this);
         findViewById(R.id.google_sign_in_button).setOnClickListener(this);
 
@@ -103,12 +104,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    display("Logged");
-                    insertUser(user);
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                if (firebaseUser != null) {
+//                     User is signed in
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
                     finish();
                 } else {
                     // User is signed out
@@ -189,7 +189,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.email_register_button:
+            case R.id.email_register_text:
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
                 break;
             case R.id.email_sign_in_button:
@@ -310,7 +310,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         showProgress(false);
-
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
@@ -333,8 +332,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         showProgress(false);
+                        insertUser(task.getResult().getUser());
                         if (!task.isSuccessful()) {
-                            display("!task.isSuccessful()");
+                            toastLong(getString(R.string.error_unable_to_connect));
                         }
                     }
                 });
@@ -348,15 +348,16 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         showProgress(false);
+                        insertUser(task.getResult().getUser());
                         if (!task.isSuccessful()) {
                             toastLong(getString(R.string.error_unable_to_connect));
                         }
                     }
                 });
     }
+
     private void insertUser(FirebaseUser firebaseUser) {
-        DatabaseReference mDatabase;
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
 
         User user = new User();
         user.setId(firebaseUser.getUid());

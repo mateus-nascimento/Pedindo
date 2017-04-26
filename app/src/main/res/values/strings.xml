@@ -6,7 +6,7 @@
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
-    <string name="action_register">Register</string>
+    <string name="action_register">Doesn\'t have an account? Register here...</string>
     <string name="action_sign_in_facebook">Sign in with facebook</string>
     <string name="action_sign_in_google">Sign in with google</string>
     <string name="action_sign_in_short">Sign in</string>
@@ -16,7 +16,12 @@
     <string name="error_field_required">This field is required</string>
     <string name="error_unable_to_connect">Unable to connect</string>
 
-    <!-- Strings related to main -->
+    <!-- Strings related to register-->
+    <string name="action_create">Create</string>
+    <string name="error_invalid_name">This name is too short</string>
+
+
+    <!-- Strings related to activity_main -->
     <string name="title_activity_main">Pedindo</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -30,5 +35,10 @@
     <string name="node_users">users</string>
     <string name="action_remove_filter">Remove filters</string>
     <string name="action_car_filter">Cars</string>
+    <string name="prompt_name">Name</string>
+
+    <string name="default_none">none</string>
+    <string name="default_photo">https://goo.gl/yE7Bdu</string>
+
 
 </resources>
