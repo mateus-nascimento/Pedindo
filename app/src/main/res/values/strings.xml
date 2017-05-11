@@ -23,8 +23,8 @@
 
     <!-- Strings related to activity_main -->
     <string name="title_activity_main">Pedindo</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="open_drawer">Open navigation drawer</string>
+    <string name="close_drawer">Close navigation drawer</string>
 
 
     <!-- Strings related to keys -->
@@ -39,6 +39,9 @@
 
     <string name="default_none">none</string>
     <string name="default_photo">https://goo.gl/yE7Bdu</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

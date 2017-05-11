@@ -3,18 +3,19 @@ package ledare.com.br.pedindo.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -22,119 +23,77 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import ledare.com.br.pedindo.R;
+import ledare.com.br.pedindo.fragment.StoreFragment;
 import ledare.com.br.pedindo.model.User;
 import ledare.com.br.pedindo.util.CircleTransform;
 
-public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity {
 
-    //Constants
-    public static final String EXTRA_USER = "EXTRA_USER";
+    private NavigationView navigationView;
+    private DrawerLayout navigationDrawer;
+    private View navigationHeader;
 
-    private User user;
+    private TextView txtName, txtEmail;
+    private ImageView imgProfile;
 
-    private DatabaseReference mDatabase;
+    private static final String urlProfileImg = "https://lh3.googleusercontent.com/eCtE_G34M9ygdkmOpYvCag1vBARCmZwnVS6rS5t4JLzJ6QgQSBquM0nuTsCpLhYbKljoyS-txg";
+
+    // index to identify current nav menu item
+    public static int navigationItemIndex = 0;
+
+    // tags used to attach the fragments
+    private static final String TAG_STORE = "STORE";
+    public static String CURRENT_TAG = TAG_STORE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setupToolbar(getString(R.string.app_name));
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        navigationDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View header = navigationView.getHeaderView(0);
-        setupUser(header);
+        // Navigation view header
+        navigationHeader = navigationView.getHeaderView(0);
+        txtName = (TextView) navigationHeader.findViewById(R.id.name);
+        txtEmail = (TextView) navigationHeader.findViewById(R.id.email);
+        imgProfile = (ImageView) navigationHeader.findViewById(R.id.img_profile);
+
+        // setup the interface
+        setupNavigationHeader();
+        setupNavigationView();
+        setupFragment();
     }
-
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        if (navigationDrawer.isDrawerOpen(GravityCompat.START)) {
+            navigationDrawer.closeDrawers();
+            return;
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(
-                new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String query) {
-                        //Final Search
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onQueryTextChange(String newText) {
-                        //Real Time Search
-                        return false;
-                    }
-                }
-        );
-        return true;
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_offers) {
-
-        } else if (id == R.id.nav_profile) {
-
-        } else if (id == R.id.nav_logout) {
-            FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            finish();
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-
-    private void setupUser(View view) {
-        final TextView name = (TextView) view.findViewById(R.id.header_name);
-        final TextView email = (TextView) view.findViewById(R.id.header_email);
-        final ImageView image = (ImageView) view.findViewById(R.id.header_image);
-
+    private void setupNavigationHeader() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
         mDatabase.child(firebaseUser.getUid()).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        user = dataSnapshot.getValue(User.class);
+                        User user = dataSnapshot.getValue(User.class);
 
-                        name.setText(user.getName());
-                        email.setText(user.getEmail());
-                        Picasso.with(MainActivity.this).load(user.getPhoto())
-                                .transform(new CircleTransform())
-                                .into(image);
+                        txtName.setText(user.getName());
+                        txtEmail.setText("TESTE@TESTE");
+                        Glide.with(MainActivity.this).load(user.getPhoto())
+                                .crossFade()
+                                .thumbnail(0.5f)
+                                .bitmapTransform(new CircleTransform(MainActivity.this))
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .into(imgProfile);
                     }
 
                     @Override
@@ -144,4 +103,96 @@ public class MainActivity extends BaseActivity
                 }
         );
     }
+
+    private void setupNavigationView() {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.nav_store:
+                        navigationItemIndex = 0;
+                        CURRENT_TAG = TAG_STORE;
+                        break;
+                    case R.id.nav_exit:
+                        // launch new intent instead of loading fragment
+//                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+//                        finish();
+                        navigationDrawer.closeDrawers();
+                        return true;
+                    default:
+                        navigationItemIndex = 0;
+                }
+
+                if (menuItem.isChecked()) {
+                    menuItem.setChecked(false);
+                } else {
+                    menuItem.setChecked(true);
+                }
+                menuItem.setChecked(true);
+
+                setupFragment();
+                return true;
+            }
+        });
+
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,
+                navigationDrawer, toolbar, R.string.open_drawer, R.string.close_drawer) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                // Code here will be triggered once the navigationDrawer closes as we dont want anything to happen so we leave this blank
+                super.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                // Code here will be triggered once the navigationDrawer open as we dont want anything to happen so we leave this blank
+                super.onDrawerOpened(drawerView);
+            }
+        };
+
+        //Setting the actionbarToggle to navigationDrawer layout
+        navigationDrawer.setDrawerListener(actionBarDrawerToggle);
+
+        //calling sync state is necessary or else your hamburger icon wont show up
+        actionBarDrawerToggle.syncState();
+
+    }
+
+    private void setupFragment() {
+        navigationView.getMenu().getItem(navigationItemIndex).setChecked(true);
+
+        if (getSupportFragmentManager().findFragmentByTag(CURRENT_TAG) != null) {
+            navigationDrawer.closeDrawers();
+            return;
+        }
+
+        Fragment fragment = getFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
+                android.R.anim.fade_out);
+        fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
+        fragmentTransaction.commitAllowingStateLoss();
+
+        // closing drawer on item click
+        navigationDrawer.closeDrawers();
+
+        // refresh toolbar menu
+        invalidateOptionsMenu();
+
+    }
+
+    private Fragment getFragment() {
+        switch (navigationItemIndex) {
+            case 0:
+                // store
+                StoreFragment storeFragment = new StoreFragment();
+                return storeFragment;
+            default:
+                return new StoreFragment();
+        }
+    }
 }
+
+
+
