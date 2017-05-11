@@ -1,6 +1,7 @@
 package ledare.com.br.pedindo.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,21 +33,19 @@ import ledare.com.br.pedindo.util.CircleTransform;
 
 public class MainActivity extends BaseActivity {
 
+    //Constants
+    public static int navigationItemIndex = 0;
+    private static final String TAG_STORE = "STORE";
+    public static String CURRENT_TAG = TAG_STORE;
+    public static final String USER_PREFERENCE = "USER_PREFERENCE";
+
+
     private NavigationView navigationView;
     private DrawerLayout navigationDrawer;
     private View navigationHeader;
 
     private TextView txtName, txtEmail;
     private ImageView imgProfile;
-
-    private static final String urlProfileImg = "https://lh3.googleusercontent.com/eCtE_G34M9ygdkmOpYvCag1vBARCmZwnVS6rS5t4JLzJ6QgQSBquM0nuTsCpLhYbKljoyS-txg";
-
-    // index to identify current nav menu item
-    public static int navigationItemIndex = 0;
-
-    // tags used to attach the fragments
-    private static final String TAG_STORE = "STORE";
-    public static String CURRENT_TAG = TAG_STORE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class MainActivity extends BaseActivity {
         navigationDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-        // Navigation view header
+        // navigation view header
         navigationHeader = navigationView.getHeaderView(0);
         txtName = (TextView) navigationHeader.findViewById(R.id.name);
         txtEmail = (TextView) navigationHeader.findViewById(R.id.email);
@@ -78,30 +78,18 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setupNavigationHeader() {
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
-        mDatabase.child(firebaseUser.getUid()).addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
+        SharedPreferences prefs = getSharedPreferences(USER_PREFERENCE, MODE_PRIVATE);
+        String name = prefs.getString("name", "No name defined");
+        String email = prefs.getString("email", "No email defined");
+        String photo = prefs.getString("photo", " ");
 
-                        txtName.setText(user.getName());
-                        txtEmail.setText("TESTE@TESTE");
-                        Glide.with(MainActivity.this).load(user.getPhoto())
-                                .crossFade()
-                                .thumbnail(0.5f)
-                                .bitmapTransform(new CircleTransform(MainActivity.this))
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .into(imgProfile);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                }
-        );
+        txtName.setText(name);
+        txtEmail.setText(email);
+        Glide.with(MainActivity.this).load(photo)
+                .crossFade()
+                .thumbnail(0.5f)
+                .bitmapTransform(new CircleTransform(MainActivity.this))
+                .into(imgProfile);
     }
 
     private void setupNavigationView() {

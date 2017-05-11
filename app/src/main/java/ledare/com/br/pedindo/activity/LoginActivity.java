@@ -3,6 +3,7 @@ package ledare.com.br.pedindo.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -52,19 +53,17 @@ import ledare.com.br.pedindo.model.User;
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     //Constants
-    public static final String EXTRA_USER = "EXTRA_USER";
-
-    //Variables
     private static final int RC_SIGN_IN = 1;
+    public static final String USER_PREFERENCE = "USER_PREFERENCE";
 
     //UI references.
     private TextInputEditText mEmailView;
     private TextInputEditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    private LoginButton loginButton;
 
-    //Data references
+    //Firebase references
+    private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
@@ -99,7 +98,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        //Initialize auth
+        //Initialize firebase
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -357,7 +356,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void insertUser(FirebaseUser firebaseUser) {
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
 
         User user = new User();
         user.setId(firebaseUser.getUid());
@@ -365,6 +363,15 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         user.setEmail(firebaseUser.getEmail());
         user.setPhoto(String.valueOf(firebaseUser.getPhotoUrl()));
 
+        //saving on firebase
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
         mDatabase.child(firebaseUser.getUid()).setValue(user);
+
+        //saving name, email and photo(url) in preferences
+        SharedPreferences.Editor editor = getSharedPreferences(USER_PREFERENCE, MODE_PRIVATE).edit();
+        editor.putString("name", user.getName());
+        editor.putString("email", user.getEmail());
+        editor.putString("photo", user.getPhoto());
+        editor.apply();
     }
 }
