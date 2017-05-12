@@ -34,6 +34,8 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void display(String message){
-        Log.d("DISPLAY", message);
+        if (message != null) {
+            Log.d("DISPLAY", message);
+        }
     }
 }

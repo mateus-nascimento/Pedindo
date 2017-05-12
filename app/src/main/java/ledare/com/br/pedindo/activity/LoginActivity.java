@@ -8,7 +8,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -41,6 +43,7 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -63,7 +66,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private View mLoginFormView;
 
     //Firebase references
-    private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
@@ -74,6 +76,23 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Initialize firebase
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    insertUser(user);
+
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        };
+
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
 
@@ -98,24 +117,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        //Initialize firebase
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                if (firebaseUser != null) {
-//                     User is signed in
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    // User is signed out
-                    display("Not Logged");
-                }
-            }
-        };
-
         //Initialize google
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.key_google))
@@ -126,7 +127,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        display("onConnectionFailed()");
+                        display(connectionResult.toString());
                     }
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -150,10 +151,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
             @Override
             public void onError(FacebookException error) {
-                display("onError()");
+                display(error.toString());
             }
         });
-
     }
 
     @Override
@@ -161,20 +161,20 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
 
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    getPackageName(),
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        }
-        catch (PackageManager.NameNotFoundException e) {
-        }
-        catch (NoSuchAlgorithmException e) {
-        }
+//        try {
+//            PackageInfo info = getPackageManager().getPackageInfo(
+//                    getPackageName(),
+//                    PackageManager.GET_SIGNATURES);
+//            for (Signature signature : info.signatures) {
+//                MessageDigest md = MessageDigest.getInstance("SHA");
+//                md.update(signature.toByteArray());
+//                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+//            }
+//        }
+//        catch (PackageManager.NameNotFoundException e) {
+//        }
+//        catch (NoSuchAlgorithmException e) {
+//        }
     }
 
     @Override
@@ -211,11 +211,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             } else{
-                display("!result.isSuccess()");
+                toastShort(getString(R.string.error_unable_to_connect));
             }
-        } else {
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
+
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -313,7 +313,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            toastLong(getString(R.string.error_unable_to_connect));
+                            toastLong(getString(R.string.authentication_failed));
+                            display(task.getException().toString());
                         }
                     }
                 });
@@ -331,9 +332,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         showProgress(false);
-                        insertUser(task.getResult().getUser());
                         if (!task.isSuccessful()) {
-                            toastLong(getString(R.string.error_unable_to_connect));
+                            toastLong(getString(R.string.authentication_failed));
+                            display(task.getException().toString());
                         }
                     }
                 });
@@ -347,16 +348,15 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         showProgress(false);
-                        insertUser(task.getResult().getUser());
                         if (!task.isSuccessful()) {
-                            toastLong(getString(R.string.error_unable_to_connect));
+                            toastLong(getString(R.string.authentication_failed));
+                            display(task.getException().toString());
                         }
                     }
                 });
     }
 
     private void insertUser(FirebaseUser firebaseUser) {
-
         User user = new User();
         user.setId(firebaseUser.getUid());
         user.setName(firebaseUser.getDisplayName());
@@ -364,8 +364,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         user.setPhoto(String.valueOf(firebaseUser.getPhotoUrl()));
 
         //saving on firebase
+        DatabaseReference mDatabase;
         mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
-        mDatabase.child(firebaseUser.getUid()).setValue(user);
+        mDatabase.child(user.getId()).setValue(user);
 
         //saving name, email and photo(url) in preferences
         SharedPreferences.Editor editor = getSharedPreferences(USER_PREFERENCE, MODE_PRIVATE).edit();

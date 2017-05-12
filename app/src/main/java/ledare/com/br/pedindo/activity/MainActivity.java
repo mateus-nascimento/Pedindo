@@ -9,26 +9,16 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import ledare.com.br.pedindo.R;
 import ledare.com.br.pedindo.fragment.StoreFragment;
-import ledare.com.br.pedindo.model.User;
 import ledare.com.br.pedindo.util.CircleTransform;
 
 public class MainActivity extends BaseActivity {
@@ -79,8 +69,8 @@ public class MainActivity extends BaseActivity {
 
     private void setupNavigationHeader() {
         SharedPreferences prefs = getSharedPreferences(USER_PREFERENCE, MODE_PRIVATE);
-        String name = prefs.getString("name", "No name defined");
-        String email = prefs.getString("email", "No email defined");
+        String name = prefs.getString("name", "No name detected");
+        String email = prefs.getString("email", "No email detected");
         String photo = prefs.getString("photo", " ");
 
         txtName.setText(name);
@@ -97,15 +87,14 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.nav_store:
+                    case R.id.nav_stores:
                         navigationItemIndex = 0;
                         CURRENT_TAG = TAG_STORE;
                         break;
                     case R.id.nav_exit:
-                        // launch new intent instead of loading fragment
-//                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
-//                        finish();
-                        navigationDrawer.closeDrawers();
+                        FirebaseAuth.getInstance().signOut();
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        finish();
                         return true;
                     default:
                         navigationItemIndex = 0;

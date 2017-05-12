@@ -3,6 +3,7 @@ package ledare.com.br.pedindo.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -33,6 +34,8 @@ import ledare.com.br.pedindo.model.User;
 
 public class RegisterActivity extends BaseActivity implements View.OnClickListener {
 
+    public static final String USER_PREFERENCE = "USER_PREFERENCE";
+
     //UI references.
     private TextInputEditText mNameView;
     private TextInputEditText mEmailView;
@@ -49,6 +52,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        user = new User();
 
         //Initialize UI
         mNameView = (TextInputEditText) findViewById(R.id.name);
@@ -71,7 +76,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         mProgressView = findViewById(R.id.register_progress);
 
         //Initialize auth
-        user = new User();
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -82,9 +86,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
-                } else {
-                    // User is signed out
-                    display("Not Logged");
                 }
             }
         };
@@ -200,16 +201,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 });
     }
 
-    private void insertUser(FirebaseUser firebaseUser) {
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
-
-        user.setId(firebaseUser.getUid());
-        user.setEmail(firebaseUser.getEmail());
-        user.setPhoto(getString(R.string.default_photo));
-
-        mDatabase.child(firebaseUser.getUid()).setValue(user);
-    }
-
     private void showProgress(final boolean show) {
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -232,4 +223,21 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         });
     }
 
+    private void insertUser(FirebaseUser firebaseUser) {
+        user.setId(firebaseUser.getUid());
+        user.setEmail(firebaseUser.getEmail());
+        user.setPhoto(getString(R.string.default_photo));
+
+        //saving on firebase
+        DatabaseReference mDatabase;
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
+        mDatabase.child(user.getId()).setValue(user);
+
+        //saving name, email and photo(url) in preferences
+        SharedPreferences.Editor editor = getSharedPreferences(USER_PREFERENCE, MODE_PRIVATE).edit();
+        editor.putString("name", user.getName());
+        editor.putString("email", user.getEmail());
+        editor.putString("photo", user.getPhoto());
+        editor.apply();
+    }
 }

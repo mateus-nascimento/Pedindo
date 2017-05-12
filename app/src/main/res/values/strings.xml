@@ -15,6 +15,7 @@
     <string name="error_incorrect_password">User/Password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="error_unable_to_connect">Unable to connect</string>
+    <string name="authentication_failed">Authentication failed</string>
 
     <!-- Strings related to register-->
     <string name="action_create">Create</string>
@@ -37,7 +38,7 @@
     <string name="action_car_filter">Cars</string>
     <string name="prompt_name">Name</string>
 
-    <string name="default_none">none</string>
+    <string name="default_none">user</string>
     <string name="default_photo">https://goo.gl/yE7Bdu</string>
 
     <!-- TODO: Remove or change this placeholder text -->
