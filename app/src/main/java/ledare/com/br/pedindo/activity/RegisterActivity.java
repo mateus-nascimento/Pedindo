@@ -17,6 +17,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -35,6 +36,7 @@ import ledare.com.br.pedindo.model.User;
 public class RegisterActivity extends BaseActivity implements View.OnClickListener {
 
     public static final String USER_PREFERENCE = "USER_PREFERENCE";
+    private static final String TAG = "EmailPassword";
 
     //UI references.
     private TextInputEditText mNameView;
@@ -80,12 +82,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
-                    // User is signed in
-                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+
                 }
             }
         };
@@ -193,9 +192,24 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         showProgress(false);
-                        insertUser(task.getResult().getUser());
                         if (!task.isSuccessful()) {
-                            toastLong(getString(R.string.error_unable_to_connect));
+                            toastLong(task.getException().getMessage());
+                        } else{
+                            insertUser(task.getResult().getUser());
+                            final FirebaseUser firebaseUser = task.getResult().getUser();
+                            firebaseUser.sendEmailVerification()
+                                    .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                toastLong(getString(R.string.verification_send) + " '" + firebaseUser.getEmail() + "'");
+                                                finish();
+                                            } else {
+                                                Log.d("DISPLAY", "sendEmailVerification", task.getException());
+                                                toastLong(getString(R.string.verification_error));
+                                            }
+                                        }
+                                    });
                         }
                     }
                 });

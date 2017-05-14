@@ -27,6 +27,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
@@ -57,7 +58,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     //Constants
     private static final int RC_SIGN_IN = 1;
-    public static final String USER_PREFERENCE = "USER_PREFERENCE";
+    private static final String USER_PREFERENCE = "USER_PREFERENCE";
+    private static final boolean EMAIL_VERIFIED = false;
 
     //UI references.
     private TextInputEditText mEmailView;
@@ -83,12 +85,31 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    insertUser(user);
 
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                if (user != null) {
+                    for (UserInfo profile : user.getProviderData()) {
+
+                        String providerId = profile.getProviderId();
+                        Log.d("DISPLAY", providerId);
+
+                        String uid = profile.getUid();
+                        Log.d("DISPLAY", uid);
+
+                        if (profile.getProviderId().equals("password")) {
+                            if (!user.isEmailVerified()) {
+                                toastShort(getString(R.string.verify_email));
+                                firebaseAuth.signOut();
+                            } else {
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        } else{
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
                 }
             }
         };
@@ -127,31 +148,31 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        display(connectionResult.toString());
+                        toastShort(connectionResult.getErrorMessage());
                     }
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
         //Initialize facebook
+        LoginManager.getInstance().logOut();
         mCallbackManager = CallbackManager.Factory.create();
         LoginButton loginButton = (LoginButton) findViewById(R.id.facebook_sign_in_button);
         loginButton.setReadPermissions("email", "public_profile");
         loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                display("onSuccess()");
                 firebaseAuthWithFacebook(loginResult.getAccessToken());
             }
 
             @Override
             public void onCancel() {
-                display("onCancel()");
             }
 
             @Override
             public void onError(FacebookException error) {
-                display(error.toString());
+                LoginManager.getInstance().logOut();
+                toastShort(error.getMessage());
             }
         });
     }
@@ -272,12 +293,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -313,8 +332,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            toastLong(getString(R.string.authentication_failed));
-                            display(task.getException().toString());
+                            toastLong(task.getException().getMessage());
                         }
                     }
                 });
@@ -333,8 +351,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         showProgress(false);
                         if (!task.isSuccessful()) {
-                            toastLong(getString(R.string.authentication_failed));
-                            display(task.getException().toString());
+                            toastLong(task.getException().getMessage());
+                        } else {
+                            insertUser(task.getResult().getUser());
                         }
                     }
                 });
@@ -349,8 +368,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         showProgress(false);
                         if (!task.isSuccessful()) {
-                            toastLong(getString(R.string.authentication_failed));
-                            display(task.getException().toString());
+                            toastLong(task.getException().getMessage());
+                        } else {
+                            insertUser(task.getResult().getUser());
                         }
                     }
                 });

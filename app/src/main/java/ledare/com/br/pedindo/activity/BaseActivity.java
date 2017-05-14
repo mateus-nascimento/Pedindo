@@ -32,10 +32,4 @@ public class BaseActivity extends AppCompatActivity {
     protected void toastLong(String message){
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
-
-    protected void display(String message){
-        if (message != null) {
-            Log.d("DISPLAY", message);
-        }
-    }
 }

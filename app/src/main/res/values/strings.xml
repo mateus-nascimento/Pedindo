@@ -16,10 +16,14 @@
     <string name="error_field_required">This field is required</string>
     <string name="error_unable_to_connect">Unable to connect</string>
     <string name="authentication_failed">Authentication failed</string>
+    <string name="verify_email">Verify your email to proceed</string>
+
 
     <!-- Strings related to register-->
     <string name="action_create">Create</string>
     <string name="error_invalid_name">This name is too short</string>
+    <string name="verification_send">Verification email sent to:</string>
+    <string name="verification_error">Failed to send verification email</string>
 
 
     <!-- Strings related to activity_main -->
