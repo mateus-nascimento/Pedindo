@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_stores"
+            android:id="@+id/navigation_stores"
             android:icon="@drawable/ic_navigation_stores"
             android:title="Stores" />
 
@@ -12,8 +11,8 @@
     <item android:title="Others">
         <menu>
             <item
-                android:id="@+id/nav_exit"
-                android:icon="@drawable/ic_menu_exit"
+                android:id="@+id/navigation_exit"
+                android:icon="@drawable/ic_navigation_exit"
                 android:title="Exit" />
         </menu>
     </item>

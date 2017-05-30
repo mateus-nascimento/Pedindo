@@ -1,27 +1,39 @@
 package ledare.com.br.pedindo.activity;
 
+import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.Toast;
 
 import ledare.com.br.pedindo.R;
+import ledare.com.br.pedindo.model.User;
 
 public class BaseActivity extends AppCompatActivity {
 
     protected Toolbar toolbar;
+    protected ProgressDialog mProgressDialog;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    protected void setupToolbar(String message) {
+    protected void setupToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         if(toolbar != null){
-            toolbar.setTitle(message);
             setSupportActionBar(toolbar);
+        }
+    }
+
+    protected void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage(getString(R.string.loading));
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.show();
+    }
+
+    protected void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
         }
     }
 

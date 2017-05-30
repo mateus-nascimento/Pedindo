@@ -1,52 +1,47 @@
 <resources>
     <string name="app_name">Pedindo</string>
-    <string name="title_activity_login">Sign in</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in</string>
-    <string name="action_register">Doesn\'t have an account? Register here...</string>
-    <string name="action_sign_in_facebook">Sign in with facebook</string>
-    <string name="action_sign_in_google">Sign in with google</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">User/Password is incorrect</string>
+    <!-- BaseActivity -->
+    <string name="loading">Loading…</string>
+
+    <!-- LoginActivity -->
+    <string name="text_email">Email</string>
+    <string name="text_password">Password</string>
+    <string name="button_login">Login</string>
+    <string name="text_register">Doesn\'t have an account? Register here…</string>
+    <!-- ERROR LOGIN -->
+    <string name="error_account_wrong">Account corresponding to email does not exist</string>
+    <string name="error_password_wrong">Password is wrong</string>
     <string name="error_field_required">This field is required</string>
-    <string name="error_unable_to_connect">Unable to connect</string>
-    <string name="authentication_failed">Authentication failed</string>
-    <string name="verify_email">Verify your email to proceed</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is invalid</string>
+    <string name="error_verify_account">Verify your email address to confirm the account</string>
+    <string name="error_network">Network error. Verify your connection</string>
 
-
-    <!-- Strings related to register-->
-    <string name="action_create">Create</string>
-    <string name="error_invalid_name">This name is too short</string>
-    <string name="verification_send">Verification email sent to:</string>
+    <!-- RegisterActivity -->
+    <string name="text_username">Username</string>
+    <string name="button_register">Register</string>
+    <string name="verification_send">Verification email sent to </string>
     <string name="verification_error">Failed to send verification email</string>
+    <!-- ERROR REGISTER -->
+    <string name="error_invalid_username">This username is invalid</string>
+    <string name="error_account_used">Already exists an account with the given email address</string>
+
+    <!-- MainActivity-->
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <!-- ERROR MAIN-->
 
 
-    <!-- Strings related to activity_main -->
-    <string name="title_activity_main">Pedindo</string>
-    <string name="open_drawer">Open navigation drawer</string>
-    <string name="close_drawer">Close navigation drawer</string>
-
-
-    <!-- Strings related to keys -->
-    <string name="key_google">360673568159-ncqvfk1mv6vdn4qrkuiujs4ud89s5s3n.apps.googleusercontent.com</string>
-    <string name="key_facebook">121121731766479</string>
-
-    <!-- Strings related to nodes-->
-    <string name="node_users">users</string>
-    <string name="action_remove_filter">Remove filters</string>
-    <string name="action_car_filter">Cars</string>
-    <string name="prompt_name">Name</string>
-
-    <string name="default_none">user</string>
-    <string name="default_photo">https://goo.gl/yE7Bdu</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
+
+
+
+    <!-- DATABASE -->
+    <string name="node_users">users</string>
+    <string name="node_users_active">active</string>
 </resources>
