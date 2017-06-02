@@ -133,7 +133,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             } else {
                                 mDatabase.child(getString(R.string.node_users))
                                         .child(firebaseUser.getUid())
-                                        .child(getString(R.string.node_users_active))
+                                        .child(getString(R.string.node_user_active))
                                         .setValue(true);
 
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);

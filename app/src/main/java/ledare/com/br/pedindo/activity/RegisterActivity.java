@@ -24,7 +24,7 @@ import ledare.com.br.pedindo.model.User;
 public class RegisterActivity extends BaseActivity implements View.OnClickListener {
 
     //Username
-    private String userName;
+    private String inputName;
 
     //UI
     private TextInputEditText mNameView, mEmailView, mPasswordView;
@@ -64,7 +64,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
-        userName = mNameView.getText().toString();
+        inputName = mNameView.getText().toString();
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
@@ -91,11 +91,11 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             cancel = true;
         }
 
-        if (TextUtils.isEmpty(userName)) {
+        if (TextUtils.isEmpty(inputName)) {
             mNameView.setError(getString(R.string.error_field_required));
             focusView = mNameView;
             cancel = true;
-        } else if (!isNameValid(userName)) {
+        } else if (!isNameValid(inputName)) {
             mNameView.setError(getString(R.string.error_invalid_username));
             focusView = mEmailView;
             cancel = true;
@@ -165,10 +165,10 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
     private void insertUser(FirebaseUser firebaseUser) {
         User user = new User();
-        user.setId(firebaseUser.getUid());
-        user.setUsername(userName);
-        user.setEmail(firebaseUser.getEmail());
-        user.setActive(false);
+        user.id = firebaseUser.getUid();
+        user.username = inputName;
+        user.email = firebaseUser.getEmail();
+        user.active = false;
 
         mDatabase.child(getString(R.string.node_users)).child(firebaseUser.getUid()).setValue(user);
     }

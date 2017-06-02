@@ -33,15 +33,14 @@
     <!-- ERROR MAIN-->
 
 
-
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
-
-
-
     <!-- DATABASE -->
     <string name="node_users">users</string>
-    <string name="node_users_active">active</string>
+    <string name="node_user_active">active</string>
+
+    <string name="node_stores">stores</string>
+
 </resources>

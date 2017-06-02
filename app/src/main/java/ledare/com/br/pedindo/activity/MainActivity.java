@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -34,6 +35,7 @@ public class MainActivity extends BaseActivity {
 
     //Firebase
     private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
     private DatabaseReference mDatabase;
     protected User mUser;
 
@@ -53,40 +55,25 @@ public class MainActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser ==  null) {
+        firebaseUser = mAuth.getCurrentUser();
+        if (firebaseUser ==  null) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
         } else {
-            mDatabase.child(getString(R.string.node_users))
-                    .child(currentUser.getUid())
-                    .addListenerForSingleValueEvent(
-                    new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            mUser = dataSnapshot.getValue(User.class);
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    }
-            );
-            setupNavigation(mUser);
+            setupNavigation();
             setupFragment(new StoresFragment());
         }
     }
 
-    private void setupNavigation(User user) {
+    private void setupNavigation() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
 
         if (navigationView != null && drawerLayout != null) {
             navigationView.getMenu().getItem(0).setChecked(true);
             //Header
-            setupNavigationHeader(navigationView, user);
+            setupNavigationHeader(navigationView);
             //Navigation itens
             navigationView.setNavigationItemSelectedListener(
                     new NavigationView.OnNavigationItemSelectedListener() {
@@ -118,19 +105,35 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void setupNavigationHeader(NavigationView navigationView, User user) {
+    private void setupNavigationHeader(NavigationView navigationView) {
         View headerView = navigationView.getHeaderView(0);
-        TextView headerName = (TextView) headerView.findViewById(R.id.header_name);
-        TextView headerEmail = (TextView) headerView.findViewById(R.id.header_email);
-        ImageView headerPhoto = (ImageView) headerView.findViewById(R.id.header_photo);
+        final TextView headerName = (TextView) headerView.findViewById(R.id.header_name);
+        final TextView headerEmail = (TextView) headerView.findViewById(R.id.header_email);
+        final ImageView headerPhoto = (ImageView) headerView.findViewById(R.id.header_photo);
 
-        headerName.setText(user.getUsername());
-        headerEmail.setText(user.getEmail());
-        Glide.with(MainActivity.this).load(user.getPhoto())
-                .crossFade()
-                .thumbnail(0.5f)
-                .bitmapTransform(new CircleTransform(MainActivity.this))
-                .into(headerPhoto);
+        mDatabase.child(getString(R.string.node_users))
+                .child(firebaseUser.getUid())
+                .addValueEventListener(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                mUser = dataSnapshot.getValue(User.class);
+
+                                headerName.setText(mUser.username);
+                                headerEmail.setText(mUser.email);
+                                Glide.with(MainActivity.this).load(mUser.image)
+                                        .crossFade()
+                                        .thumbnail(0.5f)
+                                        .bitmapTransform(new CircleTransform(MainActivity.this))
+                                        .into(headerPhoto);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
     }
 
 
@@ -153,109 +156,6 @@ public class MainActivity extends BaseActivity {
                 .replace(R.id.container, fragment)
                 .commit();
     }
-
-//    private void setupNavigationHeader() {
-//        SharedPreferences prefs = getSharedPreferences(USER_PREFERENCE, MODE_PRIVATE);
-//        String name = prefs.getString("name", "No name detected");
-//        String email = prefs.getString("email", "No email detected");
-//        String photo = prefs.getString("photo", " ");
-//
-//        txtName.setText(name);
-//        txtEmail.setText(email);
-//        Glide.with(MainActivity.this).load(photo)
-//                .crossFade()
-//                .thumbnail(0.5f)
-//                .bitmapTransform(new CircleTransform(MainActivity.this))
-//                .into(imgProfile);
-//    }
-
-//    private void setupNavigationView() {
-//        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(MenuItem menuItem) {
-//                switch (menuItem.getItemId()) {
-//                    case R.id.navigation_stores:
-//                        navigationItemIndex = 0;
-//                        CURRENT_TAG = TAG_STORE;
-//                        break;
-//                    case R.id.navigation_exit:
-//                        FirebaseAuth.getInstance().signOut();
-//                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
-//                        finish();
-//                        return true;
-//                    default:
-//                        navigationItemIndex = 0;
-//                }
-//
-//                if (menuItem.isChecked()) {
-//                    menuItem.setChecked(false);
-//                } else {
-//                    menuItem.setChecked(true);
-//                }
-//                menuItem.setChecked(true);
-//
-//                setupFragment();
-//                return true;
-//            }
-//        });
-//
-//        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,
-//                navigationDrawer, toolbar, R.string.open_drawer, R.string.close_drawer) {
-//
-//            @Override
-//            public void onDrawerClosed(View drawerView) {
-//                // Code here will be triggered once the navigationDrawer closes as we dont want anything to happen so we leave this blank
-//                super.onDrawerClosed(drawerView);
-//            }
-//
-//            @Override
-//            public void onDrawerOpened(View drawerView) {
-//                // Code here will be triggered once the navigationDrawer open as we dont want anything to happen so we leave this blank
-//                super.onDrawerOpened(drawerView);
-//            }
-//        };
-//
-//        //Setting the actionbarToggle to navigationDrawer layout
-//        navigationDrawer.setDrawerListener(actionBarDrawerToggle);
-//
-//        //calling sync state is necessary or else your hamburger icon wont show up
-//        actionBarDrawerToggle.syncState();
-//
-//    }
-//
-//    private void setupFragment() {
-//        navigationView.getMenu().getItem(navigationItemIndex).setChecked(true);
-//
-//        if (getSupportFragmentManager().findFragmentByTag(CURRENT_TAG) != null) {
-//            navigationDrawer.closeDrawers();
-//            return;
-//        }
-//
-//        Fragment fragment = getFragment();
-//        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-//        fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
-//                android.R.anim.fade_out);
-//        fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
-//        fragmentTransaction.commitAllowingStateLoss();
-//
-//        // closing drawer on item click
-//        navigationDrawer.closeDrawers();
-//
-//        // refresh toolbar menu
-//        invalidateOptionsMenu();
-//
-//    }
-//
-//    private Fragment getFragment() {
-//        switch (navigationItemIndex) {
-//            case 0:
-//                // store
-//                StoresFragment storeFragment = new StoresFragment();
-//                return storeFragment;
-//            default:
-//                return new StoresFragment();
-//        }
-//    }
 }
 
 
