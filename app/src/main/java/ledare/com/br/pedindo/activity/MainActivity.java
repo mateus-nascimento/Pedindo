@@ -47,7 +47,7 @@ public class MainActivity extends BaseActivity {
 
         //Firebase
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
         mUser = new User();
     }
 
@@ -111,8 +111,7 @@ public class MainActivity extends BaseActivity {
         final TextView headerEmail = (TextView) headerView.findViewById(R.id.header_email);
         final ImageView headerPhoto = (ImageView) headerView.findViewById(R.id.header_photo);
 
-        mDatabase.child(getString(R.string.node_users))
-                .child(firebaseUser.getUid())
+        mDatabase.child(firebaseUser.getUid())
                 .addValueEventListener(
                         new ValueEventListener() {
                             @Override

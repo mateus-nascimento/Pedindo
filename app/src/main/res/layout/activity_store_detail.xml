@@ -6,4 +6,11 @@
     android:layout_height="match_parent"
     tools:context="ledare.com.br.pedindo.activity.StoreDetailActivity">
 
+    <TextView
+        android:id="@+id/teste_teste"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="50sp"
+        android:textAlignment="center" />
+
 </android.support.design.widget.CoordinatorLayout>

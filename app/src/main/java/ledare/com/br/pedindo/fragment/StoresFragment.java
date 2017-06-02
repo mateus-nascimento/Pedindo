@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -20,6 +21,7 @@ import ledare.com.br.pedindo.activity.StoreDetailActivity;
 import ledare.com.br.pedindo.adapter.StoreAdapter;
 import ledare.com.br.pedindo.model.Store;
 import ledare.com.br.pedindo.adapter.StoreViewHolder;
+import ledare.com.br.pedindo.util.StoreListener;
 
 public class StoresFragment extends Fragment {
 
@@ -56,34 +58,22 @@ public class StoresFragment extends Fragment {
         mRecyclerView.setLayoutManager(mManager);
 
         //FirebaseRecyclerAdapter
-        final Query storesQuery = mDatabase.child(getString(R.string.node_stores))
-                .limitToFirst(100);
-
-//        mAdapter = new FirebaseRecyclerAdapter<Store, StoreViewHolder>(Store.class, R.layout.item_store,
-//                StoreViewHolder.class, storesQuery) {
-//            @Override
-//            protected void populateViewHolder(final StoreViewHolder viewHolder, final Store model, final int position) {
-//                final DatabaseReference storeRef = getRef(position);
-//
-//                // Set click listener for the whole post view
-//                final String postKey = storeRef.getKey();
-//                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        // Launch StoreDetailActivity
-//                        Intent intent = new Intent(getActivity(), StoreDetailActivity.class);
-//                        intent.putExtra(StoreDetailActivity.EXTRA_POST_KEY, postKey);
-//                        startActivity(intent);
-//                    }
-//                });
-//
-//                viewHolder.bindToStore(model);
-//            }
-//        };
+        final Query storesQuery = mDatabase.child(getString(R.string.node_stores)).limitToFirst(100);
 
         mAdapter = new StoreAdapter(Store.class, R.layout.item_store,
-                StoreViewHolder.class, storesQuery, getActivity());
+                StoreViewHolder.class, storesQuery, getActivity(), onClickStore());
 
         mRecyclerView.setAdapter(mAdapter);
+    }
+
+    private StoreListener onClickStore() {
+        return new StoreListener() {
+            @Override
+            public void onClickStore(Store store) {
+                Intent intent = new Intent(getActivity(), StoreDetailActivity.class);
+                intent.putExtra(StoreDetailActivity.EXTRA_POST_KEY, store.id);
+                startActivity(intent);
+            }
+        };
     }
 }

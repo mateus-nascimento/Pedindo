@@ -46,7 +46,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
         //Firebase
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
     }
 
     @Override
@@ -170,6 +170,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         user.email = firebaseUser.getEmail();
         user.active = false;
 
-        mDatabase.child(getString(R.string.node_users)).child(firebaseUser.getUid()).setValue(user);
+        mDatabase.child(firebaseUser.getUid()).setValue(user);
     }
 }

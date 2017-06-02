@@ -42,7 +42,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         //Firebase
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
     }
 
     @Override
@@ -131,8 +131,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             if (!firebaseUser.isEmailVerified()) {
                                 toastLong(getString(R.string.error_verify_account));
                             } else {
-                                mDatabase.child(getString(R.string.node_users))
-                                        .child(firebaseUser.getUid())
+                                mDatabase.child(firebaseUser.getUid())
                                         .child(getString(R.string.node_user_active))
                                         .setValue(true);
 
