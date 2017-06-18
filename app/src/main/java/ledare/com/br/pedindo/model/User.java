@@ -7,7 +7,7 @@ public class User {
     public String id;
     public String username;
     public String email;
-    public String image;
+    public String photoUrl;
     public boolean active;
 
     public User () {

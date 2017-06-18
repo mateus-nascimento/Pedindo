@@ -5,6 +5,7 @@
     <string name="loading">Loading…</string>
 
     <!-- LoginActivity -->
+    <string name="activity_login">Welcome</string>
     <string name="text_email">Email</string>
     <string name="text_password">Password</string>
     <string name="button_login">Login</string>
@@ -19,8 +20,9 @@
     <string name="error_network">Network error. Verify your connection</string>
 
     <!-- RegisterActivity -->
+    <string name="activity_register">Register</string>
     <string name="text_username">Username</string>
-    <string name="button_register">Register</string>
+    <string name="button_register">Confirm</string>
     <string name="verification_send">Verification email sent to </string>
     <string name="verification_error">Failed to send verification email</string>
     <!-- ERROR REGISTER -->
@@ -33,11 +35,7 @@
     <!-- ERROR MAIN-->
 
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-
-    <!-- DATABASE -->
+    <!-- DATABASE_REFERENCE -->
     <string name="node_users">users</string>
     <string name="node_user_active">active</string>
 

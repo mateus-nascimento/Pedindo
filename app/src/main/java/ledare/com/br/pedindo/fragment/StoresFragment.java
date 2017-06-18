@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -17,10 +16,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 import ledare.com.br.pedindo.R;
-import ledare.com.br.pedindo.activity.StoreDetailActivity;
+import ledare.com.br.pedindo.activity.StoreActivity;
 import ledare.com.br.pedindo.adapter.StoreAdapter;
 import ledare.com.br.pedindo.model.Store;
 import ledare.com.br.pedindo.adapter.StoreViewHolder;
+import ledare.com.br.pedindo.util.Constants;
 import ledare.com.br.pedindo.util.StoreListener;
 
 public class StoresFragment extends Fragment {
@@ -58,7 +58,7 @@ public class StoresFragment extends Fragment {
         mRecyclerView.setLayoutManager(mManager);
 
         //FirebaseRecyclerAdapter
-        final Query storesQuery = mDatabase.child(getString(R.string.node_stores)).limitToFirst(100);
+        final Query storesQuery = mDatabase.child(Constants.DATABASE_STORES).limitToFirst(100);
 
         mAdapter = new StoreAdapter(Store.class, R.layout.item_store,
                 StoreViewHolder.class, storesQuery, getActivity(), onClickStore());
@@ -70,8 +70,8 @@ public class StoresFragment extends Fragment {
         return new StoreListener() {
             @Override
             public void onClickStore(Store store) {
-                Intent intent = new Intent(getActivity(), StoreDetailActivity.class);
-                intent.putExtra(StoreDetailActivity.EXTRA_POST_KEY, store.id);
+                Intent intent = new Intent(getActivity(), StoreActivity.class);
+                intent.putExtra(StoreActivity.EXTRA_POST_KEY, store.id);
                 startActivity(intent);
             }
         };

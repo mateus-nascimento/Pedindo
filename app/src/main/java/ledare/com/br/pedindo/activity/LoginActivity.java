@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -19,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import ledare.com.br.pedindo.R;
+import ledare.com.br.pedindo.util.Constants;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
@@ -42,7 +44,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         //Firebase
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(Constants.DATABASE_USERS);
     }
 
     @Override
@@ -117,27 +119,34 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         hideProgressDialog();
                         if (!task.isSuccessful()) {
+                            String message;
                             if (task.getException() instanceof FirebaseAuthInvalidUserException) {
-                                toastLong(getString(R.string.error_account_wrong));
+                                message = getString(R.string.error_account_wrong);
                             } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                toastLong(getString(R.string.error_password_wrong));
+                                message = getString(R.string.error_password_wrong);
                             } else if (task.getException() instanceof FirebaseNetworkException) {
-                                toastShort(getString(R.string.error_network));
+                                message = getString(R.string.error_network);
                             } else {
-                                toastLong(task.getException().getMessage());
+                                message = task.getException().getMessage();
                             }
+
+                            Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+
                         } else {
                             final FirebaseUser firebaseUser = task.getResult().getUser();
                             if (!firebaseUser.isEmailVerified()) {
-                                toastLong(getString(R.string.error_verify_account));
+                                Toast.makeText(LoginActivity.this,
+                                        getString(R.string.error_verify_account),
+                                        Toast.LENGTH_LONG).show();
                             } else {
                                 mDatabase.child(firebaseUser.getUid())
-                                        .child(getString(R.string.node_user_active))
+                                        .child(Constants.DATABASE_USER_ACTIVE)
                                         .setValue(true);
 
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
-                                finish();
                             }
                         }
                     }

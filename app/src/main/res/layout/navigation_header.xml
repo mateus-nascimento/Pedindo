@@ -15,7 +15,7 @@
         android:src="@drawable/header_background" />
 
     <ImageView
-        android:id="@+id/header_photo"
+        android:id="@+id/header_image"
         android:layout_width="@dimen/header_photo_width"
         android:layout_height="@dimen/header_photo_height"
         android:layout_alignParentLeft="true"
@@ -28,9 +28,10 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="vertical"
-        android:layout_below="@+id/header_photo"
+        android:layout_below="@id/header_image"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="8dp" >
+        android:layout_marginLeft="8dp"
+        android:id="@+id/linearLayout">
 
         <TextView
             android:id="@+id/header_name"

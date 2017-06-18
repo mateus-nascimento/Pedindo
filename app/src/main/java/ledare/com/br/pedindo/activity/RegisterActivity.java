@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -20,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import ledare.com.br.pedindo.R;
 import ledare.com.br.pedindo.model.User;
+import ledare.com.br.pedindo.util.Constants;
 
 public class RegisterActivity extends BaseActivity implements View.OnClickListener {
 
@@ -37,6 +40,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //UI
         mNameView = (TextInputEditText) findViewById(R.id.header_name);
@@ -46,7 +50,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
         //Firebase
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(Constants.DATABASE_USERS);
     }
 
     @Override
@@ -56,6 +60,15 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 evaluateFields();
                 break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void evaluateFields() {
@@ -128,36 +141,26 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         hideProgressDialog();
                         if (!task.isSuccessful()) {
+                            String message;
                             if (task.getException() instanceof FirebaseAuthWeakPasswordException) {
-                                toastLong(getString(R.string.error_invalid_password));
+                                message = getString(R.string.error_invalid_password);
                             } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                toastLong(getString(R.string.error_invalid_email));
+                                message = getString(R.string.error_invalid_email);
                             } else if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                toastLong(getString(R.string.error_account_used));
+                                message = getString(R.string.error_account_used);
                             } else if (task.getException() instanceof FirebaseNetworkException) {
-                                toastShort(getString(R.string.error_network));
+                                message = getString(R.string.error_network);
                             } else {
-                                toastLong(task.getException().getMessage());
+                                message = task.getException().getMessage();
                             }
+
+                            Toast.makeText(RegisterActivity.this, message,
+                                    Toast.LENGTH_LONG).show();
+
                         } else{
                             final FirebaseUser firebaseUser = task.getResult().getUser();
-                            sendVerification(firebaseUser);
                             insertUser(firebaseUser);
-                            finish();
-                        }
-                    }
-                });
-    }
-
-    private void sendVerification(final FirebaseUser firebaseUser) {
-        firebaseUser.sendEmailVerification()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            toastLong(getString(R.string.verification_send) + firebaseUser.getEmail());
-                        } else {
-                            toastShort(getString(R.string.verification_error));
+                            sendVerification(firebaseUser);
                         }
                     }
                 });
@@ -169,7 +172,26 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         user.username = inputName;
         user.email = firebaseUser.getEmail();
         user.active = false;
+        user.photoUrl = "https://firebasestorage.googleapis.com/v0/b/pedindo-da0aa.appspot.com/o/default%2Fdefault_user_image.png?alt=media&token=c2a154c1-b282-4a96-85ce-ffc41c2c418d";
 
         mDatabase.child(firebaseUser.getUid()).setValue(user);
+    }
+
+    private void sendVerification(final FirebaseUser firebaseUser) {
+        firebaseUser.sendEmailVerification()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Toast.makeText(RegisterActivity.this,
+                                    getString(R.string.verification_send) + " " + firebaseUser.getEmail(),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(RegisterActivity.this,
+                                    getString(R.string.verification_error),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }

@@ -11,7 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.LoginActivity" />
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="@string/activity_login" />
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:label="@string/activity_register" />
         <activity
             android:name=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -21,8 +26,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.RegisterActivity" />
-        <activity android:name=".activity.StoreDetailActivity"></activity>
+        <activity
+            android:name=".activity.StoreActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

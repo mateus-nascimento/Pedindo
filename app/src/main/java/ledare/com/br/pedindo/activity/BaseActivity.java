@@ -36,12 +36,4 @@ public class BaseActivity extends AppCompatActivity {
             mProgressDialog.dismiss();
         }
     }
-
-    protected void toastShort(String message){
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    protected void toastLong(String message){
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
 }

@@ -6,6 +6,9 @@
     <dimen name="header_photo_width">65dp</dimen>
     <dimen name="header_photo_height">65dp</dimen>
 
+    <dimen name="header_info_width">48dp</dimen>
+    <dimen name="header_info_height">48dp</dimen>
+
 
     <dimen name="nav_header_height">160dp</dimen>
 </resources>

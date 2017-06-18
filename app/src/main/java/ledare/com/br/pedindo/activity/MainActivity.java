@@ -23,6 +23,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
+
+import ledare.com.br.pedindo.util.Constants;
 import ledare.com.br.pedindo.R;
 import ledare.com.br.pedindo.fragment.StoresFragment;
 import ledare.com.br.pedindo.model.User;
@@ -33,22 +36,24 @@ public class MainActivity extends BaseActivity {
     //UI
     private DrawerLayout drawerLayout;
 
+    //User
+    private User mUser;
+
     //Firebase
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
     private DatabaseReference mDatabase;
-    protected User mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         setupToolbar();
+        getSupportActionBar().setTitle("Stores");
 
         //Firebase
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(getString(R.string.node_users));
-        mUser = new User();
     }
 
     @Override
@@ -56,11 +61,16 @@ public class MainActivity extends BaseActivity {
         super.onStart();
 
         firebaseUser = mAuth.getCurrentUser();
-        if (firebaseUser ==  null) {
+        if (firebaseUser == null) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-            finish();
         } else {
+            mDatabase = FirebaseDatabase.getInstance().getReference().
+                    child(Constants.DATABASE_USERS).
+                    child(firebaseUser.getUid());
+
             setupNavigation();
             setupFragment(new StoresFragment());
         }
@@ -109,10 +119,10 @@ public class MainActivity extends BaseActivity {
         View headerView = navigationView.getHeaderView(0);
         final TextView headerName = (TextView) headerView.findViewById(R.id.header_name);
         final TextView headerEmail = (TextView) headerView.findViewById(R.id.header_email);
-        final ImageView headerPhoto = (ImageView) headerView.findViewById(R.id.header_photo);
+        final ImageView headerPhoto = (ImageView) headerView.findViewById(R.id.header_image);
 
-        mDatabase.child(firebaseUser.getUid())
-                .addValueEventListener(
+        //Profile
+        mDatabase.addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -120,7 +130,7 @@ public class MainActivity extends BaseActivity {
 
                                 headerName.setText(mUser.username);
                                 headerEmail.setText(mUser.email);
-                                Glide.with(MainActivity.this).load(mUser.image)
+                                Glide.with(MainActivity.this).load(mUser.photoUrl)
                                         .crossFade()
                                         .thumbnail(0.5f)
                                         .bitmapTransform(new CircleTransform(MainActivity.this))
@@ -134,7 +144,6 @@ public class MainActivity extends BaseActivity {
                         }
                 );
     }
-
 
     private void onNavigationSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {

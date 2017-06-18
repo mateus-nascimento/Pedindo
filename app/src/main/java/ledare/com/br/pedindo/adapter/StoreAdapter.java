@@ -30,7 +30,7 @@ public class StoreAdapter extends FirebaseRecyclerAdapter<Store, StoreViewHolder
     protected void populateViewHolder(final StoreViewHolder viewHolder, final Store model, final int position) {
         viewHolder.titleView.setText(model.title);
         viewHolder.descriptionView.setText(model.description);
-        Glide.with(mContext).load(model.image)
+        Glide.with(mContext).load(model.photoUrl)
                 .crossFade()
                 .thumbnail(0.5f)
                 .into(viewHolder.imageView);
